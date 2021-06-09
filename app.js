@@ -177,7 +177,6 @@ app.get('/dindex', (req, res) => {
                     Permanentwebinar.find({}, (err, permanentwebinaritems) => {
                         Joinus.find({}, (err, careeritems) => {
                             if (err) {
-                                console.log(err);
                                 res.status(500).send('An error occurred', err);
                             } else {
                                 res.render('dindex', {
@@ -276,7 +275,6 @@ app.get('/training', (req, res) => {
 app.get('/webinar', (req, res) => {
     Webinar.find({}, (err, items) => {
         if (err) {
-            console.log(err);
             res.status(500).send('An error occurred', err);
         } else {
             res.render('webinar', {
@@ -305,8 +303,6 @@ app.get("/joinUs", function (req, res) {
         });
     }
 })
-
-
 
 app.get("/contact", function (req, res) {
     res.render("contact", {
@@ -342,7 +338,6 @@ app.get("/yourwebinar", function (req, res) {
         } else {
             array = user.warray;
             array.reverse();
-            console.log(array);
             res.render("yourwebinar", {
                 sessionlogged: sessionlogged,
                 array: array
@@ -410,7 +405,7 @@ app.post("/accdetails", function (req, res) {
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log("User Created");
+                    
                     res.redirect("login");
                 }
             });
@@ -442,7 +437,7 @@ app.post("/checkaccount", function (req, res) {
             req.session.user = username;
             req.session.save();
             sessionlogged = 1;
-            console.log("User Logged in");
+      
             res.redirect("/");
         }
     });
@@ -453,16 +448,12 @@ app.post("/alogin", function (req, res) {
     var password = req.body.apwd;
 
     if (process.env.ausername == username && process.env.apassword == password) {
-        console.log(true);
         req.session.user = username;
         req.session.save();
         asessionlogged = 1;
         res.redirect("dindex");
-
-
     } else {
         var alert = 1;
-        console.log(false);
         res.render("dlogin", {
             alertbox: alert
         });
@@ -571,7 +562,6 @@ app.post("/tremove", function (req, res) {
         _id: id
     }, function (err, deleteTraining) {
         if (!err) {
-            console.log("success")
             res.redirect("dindex");
         } else {
             console.log(err);
@@ -585,7 +575,7 @@ app.post("/wremove", function (req, res) {
         _id: id
     }, function (err, deleteWebinar) {
         if (!err) {
-            console.log("success")
+      
             res.redirect("dindex");
         } else {
             console.log(err);
@@ -597,14 +587,12 @@ app.post("/logout", function (req, res) {
     sessionlogged = 0;
     tregistered = 0;
     req.session.destroy();
-    console.log("User logged out!");
     res.redirect("/");
 })
 
 app.post("/alogout", function (req, res) {
     asessionlogged = 0;
     req.session.destroy();
-    console.log("User logged out!");
     res.redirect("dlogin");
 })
 
@@ -663,7 +651,7 @@ app.post("/tregister", function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            console.log("updated");
+                            
                         }
                     });
                     var mailOption4 = {
@@ -679,7 +667,7 @@ app.post("/tregister", function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            console.log('Email sent!!!');
+                            
                         }
                     });
                     res.render('training', {
@@ -721,7 +709,7 @@ app.post("/wregister", function (req, res) {
                 console.log(err);
             } else {
                 if ((user.warray.length > 0) && (user.warray.find(element => element.wname == wname && element.wdate == wdate))) {
-                    console.log("User registered already " + wname);
+                   
                     res.render('webinar', {
                         items: witems,
                         sessionlogged: sessionlogged,
@@ -742,7 +730,7 @@ app.post("/wregister", function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            console.log("updated");
+                            
                         }
                     });
                     var mailOption5 = {
@@ -756,7 +744,7 @@ app.post("/wregister", function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
-                            console.log('Email sent!!!');
+                            
                         }
                     });
                     res.render('webinar', {
@@ -801,7 +789,7 @@ app.post("/joinus", function (req, res) {
                             if (err) {
                                 console.log(err);
                             } else {
-                                console.log('Email sent!!!');
+                                
                             }
                         });
                         res.redirect("/");
@@ -837,7 +825,7 @@ app.post("/contactus", function (req, res) {
         if (err) {
             console.log(err);
         } else {
-            console.log('Email sent!!!');
+        
         }
     });
 
@@ -852,7 +840,7 @@ app.post("/contactus", function (req, res) {
         if (err) {
             console.log(err);
         } else {
-            console.log('Admin Email sent!!!');
+           
         }
     });
     res.redirect("/");
@@ -866,8 +854,8 @@ app.post("/traininginfos", function (req, res) {
         var array = [];
         var name = req.body.tname;
         var date = req.body.tdate;
-        console.log(name);
-        console.log(date);
+      
+        
         Account.find({}, function (err, user) {
             if (err) {
                 console.log(err);
@@ -875,8 +863,8 @@ app.post("/traininginfos", function (req, res) {
                 user.forEach(function (user) {
                     if ((user.tarray.length > 0) && (user.tarray.find(element => element.tname == name && element.tdate == date))) {
                         array.push(user);
-                        console.log(array);
-                        console.log(user);
+                     
+                        
                     }
 
                 });
