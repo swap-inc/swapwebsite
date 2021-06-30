@@ -27,9 +27,12 @@ var upload = multer({
 });
 
 const app = express();
+
 var sessionlogged = 0;
 var asessionlogged = 0;
 
+
+//For ejs
 app.use(express.static("public"));
 app.set('view engine', 'ejs');
 
@@ -37,6 +40,7 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 
+//Session tracking connection
 app.use(cookieParser());
 app.use(session({
     secret: "swap123",
@@ -44,12 +48,14 @@ app.use(session({
     resave: true
 }));
 
+//MongoDB Connection
 mongoose.connect("mongodb://localhost:27017/swapDB", {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     useCreateIndex: true
 });
 
+// Node Mailer Connection
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -61,6 +67,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// MongoDB Schemas Definition
 const accountSchema = new mongoose.Schema({
     accname: String,
     accemail: String,
@@ -161,6 +168,7 @@ const Permanenttraining = new mongoose.model("Permanenttraining", permanenttrain
 const Permanentwebinar = new mongoose.model("Permanentwebinar", permanentwebinarSchema);
 const Joinus = new mongoose.model("Joinus", joinusSchema);
 
+
 //GET METHODS
 
 app.get("/", function (req, res) {
@@ -254,7 +262,6 @@ app.get('/dtraining', (req, res) => {
     }
 });
 
-
 app.get('/training', (req, res) => {
     Training.find({}, (err, items) => {
 
@@ -270,7 +277,6 @@ app.get('/training', (req, res) => {
         }
     })
 });
-
 
 app.get('/webinar', (req, res) => {
     Webinar.find({}, (err, items) => {
@@ -379,6 +385,7 @@ app.get("/webinarinfo", function (req, res) {
 });
 
 
+
 // POST METHODS
 
 app.post("/accdetails", function (req, res) {
@@ -388,7 +395,6 @@ app.post("/accdetails", function (req, res) {
     }, function (err, foundAccount) {
         if (foundAccount == null) {
 
-            //bcrypt.hash(req.body.rpassword, saltRounds, function (err, hash) {
             const newAccount = new Account({
                 accname: req.body.name,
                 accemail: req.body.email,
@@ -606,6 +612,7 @@ app.post("/tregister", function (req, res) {
     var tlink = req.body.tlink;
     var tduration = req.body.tduration;
     var tprice = req.body.tprice;
+    var today = new Date();
     Training.find({}, (err, items) => {
 
         if (err) {
@@ -627,15 +634,24 @@ app.post("/tregister", function (req, res) {
             if (err) {
                 console.log(err);
             } else {
-
+                var td = new Date(tdeadline);
+                
                 if ((user.tarray.length > 0) && (user.tarray.find(element => element.tname == tname && element.tdate == tdate))) {
-                    console.log("User registered already " + tname);
+                    
                     res.render('training', {
                         items: titems,
                         sessionlogged: sessionlogged,
                         alertbox: 1
                     });
-                } else {
+                }else if(today>td) {
+                    res.render('training', {
+                        items: titems,
+                        sessionlogged: sessionlogged,
+                        alertbox: 3
+                    });
+                }
+                
+                else {
                     var t = {
                         tname: tname,
                         tdate: tdate,
@@ -690,6 +706,7 @@ app.post("/wregister", function (req, res) {
     var wtime = req.body.wtime;
     var wlink = req.body.wlink;
     var wprice = req.body.wprice;
+    var today = new Date();
     Webinar.find({}, (err, items) => {
         if (err) {
             console.log(err);
@@ -701,7 +718,7 @@ app.post("/wregister", function (req, res) {
     if (sessionlogged == 0) {
         res.redirect("login");
     } else {
-
+        var wd = new Date(wdeadline);
         Account.findOne({
             accemail: req.session.user
         }, function (err, user) {
@@ -715,7 +732,14 @@ app.post("/wregister", function (req, res) {
                         sessionlogged: sessionlogged,
                         alertbox: 1
                     });
-                } else {
+                } else if(today>wd){
+                    res.render('webinar', {
+                        items: witems,
+                        sessionlogged: sessionlogged,
+                        alertbox: 3
+                    })
+                }
+                else {
                     var w = {
                         wname: wname,
                         wdate: wdate,
@@ -914,6 +938,7 @@ if (port == null || port == "") {
     port = 3000;
 }
 
+//Listening at port 3000
 app.listen(3000, function () {
     console.log("Server started on port 3000");
 });
